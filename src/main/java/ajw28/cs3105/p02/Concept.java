@@ -1,5 +1,7 @@
 package ajw28.cs3105.p02;
 
+import org.encog.ml.data.MLData;
+
 public class Concept {
     private int conceptID;
     private String name;
@@ -38,5 +40,17 @@ public class Concept {
                 return false;
 
         }
+    }
+
+    public static int convertOutputToID(MLData netOuput) {
+        double[] output = netOuput.getData();
+        String binaryString = "";
+        for(double b_digit : output){
+            if(b_digit >= 0.5)
+                binaryString += "1";
+            else
+                binaryString += "0";
+        }
+        return Integer.parseInt(binaryString, 2);
     }
 }

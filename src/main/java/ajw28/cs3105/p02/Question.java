@@ -6,8 +6,8 @@ public class Question{
     private int questionID;
     private String questionToAsk;
     private HashMap<Concept, Boolean> conceptResponses = new HashMap<Concept, Boolean>();
-    private ANSWER answer = ANSWER.UNANSWER;
-    public enum ANSWER { YES, NO, UNANSWER };
+    private double answer = UNANSWERED;
+    public static double YES=1, NO=0, UNANSWERED=0.5;
 
     public Question(int questionID, String questionToAsk){
         this.questionID = questionID;
@@ -28,9 +28,12 @@ public class Question{
 
     public void recordQuestionAnswer(boolean didUserRespondYes){
         if(didUserRespondYes)
-            answer = ANSWER.YES;
+            answer = YES;
         else
-            answer = ANSWER.NO;
+            answer = NO;
     }
 
+    public double getAnswer() {
+        return answer;
+    }
 }

@@ -16,19 +16,19 @@ public class GameEngine {
 
         int questionNumber = 1;
         do{
-            Question question = net.getNextQuestion();
+            Question question = net.nextQuestion();
 
             System.out.println("\n" + questionNumber + ") " + question);
             boolean answer = getYesOrNoFromUser();
             question.recordQuestionAnswer(answer);
 
             questionNumber++;
-        }while(net.isReadyToGuess());
+        }while(!net.isReadyToGuess(0.00001));
 
-        Concept guess = net.getBestGuess();
-        System.out.println("After " + questionNumber + " questions, I am ready to guess..." +
-                "\nI think that you've been thinking of a" + (guess.isFirstLetterOfNameAVowel() ? "n" : "") + guess +
-                "\nAm I right? (Yes/No)\n");
+        Concept guess = net.makeBestGuess();
+        System.out.println("After " + (questionNumber-1) + " questions, I am ready to guess..." +
+                "\nI think that you've been thinking of a" + (guess.isFirstLetterOfNameAVowel() ? "n " : " ") + guess +
+                "\nAm I right? (True/False)\n");
         boolean amIRight = getYesOrNoFromUser();
         if(amIRight){
             System.out.println("Fantastic! My creator will be so proud of me! Thank you for playing!");
@@ -36,7 +36,8 @@ public class GameEngine {
             System.out.println("What were you actually thinking of? (Please help me learn)");
             String realAnswer = "";
             while(realAnswer.length() < 2) realAnswer = scanner.nextLine();
-            System.out.println("I've added your answer to my knowledge base (along with the answers which you gave to my questions)");
+            System.out.println("I've added your answer to my knowledge base (along with the answers which you gave to my questions)" +
+                    "\nGreat! Please only respond 'true' or 'false' as this is currently the only input I understand");
             net.recordConceptFromHumanAfterAnsweringQuestions(realAnswer);
         }
 
@@ -45,10 +46,14 @@ public class GameEngine {
     private boolean getYesOrNoFromUser(){
         while(true){
             try{
-                boolean answer = scanner.nextBoolean();
+                boolean answer;
+                while(!scanner.hasNextBoolean()){}
+                    answer = scanner.nextBoolean();
+
                 return answer;
             }catch (Exception e){
-                System.out.println("Please respond either 'yes' or 'no' to the question.");
+                System.out.println("Please respond either 'true' or 'false' to the question.");
+
             }
         }
     }

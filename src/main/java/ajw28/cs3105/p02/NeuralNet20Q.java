@@ -5,6 +5,7 @@ import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.MLDataPair;
 import org.encog.ml.data.MLDataSet;
+import org.encog.ml.data.basic.BasicMLData;
 import org.encog.ml.data.basic.BasicMLDataSet;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
@@ -23,6 +24,7 @@ public class NeuralNet20Q {
     private ArrayList<Concept> concepts = new ArrayList<Concept>();
     private BasicNetwork net;
     private int numberOfInputUnits, numberOfHiddenUnits, numberOfOutputUnits;
+    public static double MAX_ERROR = 0.04;
 
     public NeuralNet20Q(){
         this(DEFAULT_Q_FILE_PATH);
@@ -102,16 +104,7 @@ public class NeuralNet20Q {
     }
 
     public void train() {
-        double[][] netInputs = new double[concepts.size()][questions.size()];
-        for(int conceptNum=0; conceptNum < concepts.size(); conceptNum++){
-            Concept concept = concepts.get(conceptNum);
-            for(int questionNum=0; questionNum < concepts.size(); questionNum++){
-                double val = 0.0;
-                if(questions.get(questionNum).getResponseForConcept(concept)) val = 1.0;
-                netInputs[conceptNum][questionNum] = val;
-            }
-        }
-
+        double[][] netInputs = calculateIdealInputs();
         double[][] netOuts = new double[concepts.size()][numberOfOutputUnits];
         for(int conceptNum=0; conceptNum < concepts.size(); conceptNum++){
             netOuts[conceptNum] = concepts.get(conceptNum).getIdEncodedInBinary(numberOfOutputUnits);
@@ -121,7 +114,7 @@ public class NeuralNet20Q {
 
         // train the neural network
         ResilientPropagation trainer = new ResilientPropagation(net, trainingSet);
-        double MAX_ERROR = 0.04;
+
         while(true){
             int numOfEpochsToTrainFor = 10000 + 100 * concepts.size() * concepts.size() * numberOfHiddenUnits * numberOfHiddenUnits;
             trainer.iteration(numOfEpochsToTrainFor);
@@ -141,6 +134,7 @@ public class NeuralNet20Q {
         // test the neural network
         System.out.println("Neural Network Results:");
         for(MLDataPair pair: trainingSet ) {
+            MLData input = pair.getInput();
             final MLData output = net.compute(pair.getInput());
             System.out.println(pair.getInput().getData(0) + "," + pair.getInput().getData(1)
                     + ", actual=" + output.getData(0) + ",ideal=" + pair.getIdeal().getData(0));
@@ -149,8 +143,53 @@ public class NeuralNet20Q {
         Encog.getInstance().shutdown();
     }
 
-    private void addHiddenUnit(){
-
+    private double[][] calculateIdealInputs(){
+        double[][] netInputs = new double[concepts.size()][questions.size()];
+        for(int conceptNum=0; conceptNum < concepts.size(); conceptNum++){
+            Concept concept = concepts.get(conceptNum);
+            for(int questionNum=0; questionNum < concepts.size(); questionNum++){
+                double val = 0.0;
+                if(questions.get(questionNum).getResponseForConcept(concept)) val = 1.0;
+                netInputs[conceptNum][questionNum] = val;
+            }
+        }
+        return netInputs;
     }
 
+    private double[] calculateNetInputsFromQuestionAnswers(){
+        double[] questionAnswers = new double[questions.size()];
+        for(int i=0; i < questionAnswers.length; i++){
+            questionAnswers[i] = questions.get(i).getAnswer();
+        }
+        return questionAnswers;
+    }
+
+    public Question nextQuestion() {
+        //current implementation: find first unanswered questions TODO Choose questions that eliminates the most alternatives at each stage
+        for(Question q : questions){
+            if(q.getAnswer() == 0.5)
+                return q;
+        }
+        return null; //no questions left to unanswer.
+    }
+
+    public boolean isReadyToGuess(double allowedError) {
+        double[][] netInputs = {calculateNetInputsFromQuestionAnswers()};
+        double[][] netOuts = {makeBestGuess().getIdEncodedInBinary(numberOfOutputUnits)};
+        double error = net.calculateError( new BasicMLDataSet(netInputs, netOuts));
+        if(error > allowedError)
+            return false;
+        else
+            return true;
+    }
+
+    public Concept makeBestGuess() {
+        MLData netOuput = net.compute(new BasicMLData(calculateNetInputsFromQuestionAnswers()));
+        int conceptId = Concept.convertOutputToID(netOuput);
+        return concepts.get(conceptId);
+    }
+
+    public void recordConceptFromHumanAfterAnsweringQuestions(String realAnswer) {
+        //TODO
+    }
 }
