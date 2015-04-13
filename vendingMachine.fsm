@@ -21,7 +21,7 @@ start r beep start
 20balance c10 30balance
 20balance c20 40balance
 20balance c50 70balance
-20balance a A beep start
+20balance a A start
 20balance b 20balance
 20balance c 20balance
 20balance r C20 start
@@ -29,55 +29,55 @@ start r beep start
 30balance c10 40balance
 30balance c20 50balance
 30balance c50 80balance
-30balance a A beep 10balance
-30balance b B beep start
+30balance a A 10balance
+30balance b B start
 30balance c 30balance
 30balance r C20 C10 start
 
 40balance c10 50balance
 40balance c20 60balance
 40balance c50 90balance
-40balance a A beep 20balance
-40balance b B beep 10balance
+40balance a A 20balance
+40balance b B 10balance
 40balance c 40balance
 40balance r C20 C20 start
 
-50balance c10 C10 beep 50balance
-50balance c20 C20 beep 50balance
-50balance c50 C50 beep 50balance
-50balance a A beep 30balance
-50balance b B beep 20balance
-50balance c C beep start
+50balance c10 C10 50balance
+50balance c20 C20 50balance
+50balance c50 C50 50balance
+50balance a A 30balance
+50balance b B 20balance
+50balance c C start
 50balance r C50 start
 
-60balance c10 C10 beep 60balance
-60balance c20 C20 beep 60balance
-60balance c50 C50 beep 60balance
-60balance a A beep 40balance
-60balance b B beep 30balance
-60balance c C beep 10balance
+60balance c10 C10 60balance
+60balance c20 C20 60balance
+60balance c50 C50  60balance
+60balance a A 40balance
+60balance b B 30balance
+60balance c C 10balance
 60balance r C50 C10 start
 
-70balance c10 C10 beep 70balance
-70balance c20 C20 beep 70balance
-70balance c50 C50 beep 70balance
-70balance a A beep 50balance
-70balance b B beep 40balance
-70balance c C beep 20balance
+70balance c10 C10 70balance
+70balance c20 C20 70balance
+70balance c50 C50 70balance
+70balance a A 50balance
+70balance b B 40balance
+70balance c C 20balance
 70balance r C50 C20 start
 
-80balance c10 C10 beep 80balance
-80balance c20 C20 beep 80balance
-80balance c50 C50 beep 80balance
-80balance a A beep 60balance
-80balance b B beep 50balance
-80balance c C beep 30balance
+80balance c10 C10 80balance
+80balance c20 C20 80balance
+80balance c50 C50 80balance
+80balance a A 60balance
+80balance b B 50balance
+80balance c C 30balance
 80balance r C50 C20 C10 start
 
-90balance c10 C10 beep 90balance
-90balance c20 C20 beep 90balance
-90balance c50 C50 beep 90balance
-90balance a A beep 70balance
-90balance b B beep 60balance
-90balance c C beep 50balance
+90balance c10 C10 90balance
+90balance c20 C20 90balance
+90balance c50 C50 90balance
+90balance a A 70balance
+90balance b B 60balance
+90balance c C 50balance
 90balance r C50 C20 C20 start

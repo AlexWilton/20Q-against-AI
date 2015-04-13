@@ -1,36 +1,80 @@
 package ajw28.cs3105.p02.part2.fsm;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.util.Vector;
 
-public class FSMModel {
+public class FSM {
 
-	private class Transition {
-		private int fromState;
-		private int inSym;
-		private int outSyms[] = new int[0];
-		private int toState;
+	static final String[] ISyms = {"a", "b", "c", "r", "c10", "c20", "c50"};
+	static final String[] OSyms = {"C10", "C20", "C50", "A", "B", "C", "beep"};
+	public static final String FILE_PATH = "vendingMachine.fsm";
 
-		private Transition(int fromState, int inSym, int[] outSyms, int toState) {
-			this.fromState = fromState;
-			this.inSym = inSym;
-			this.outSyms = outSyms;
-			this.toState = toState;
+	public static FSM parse() {
+		Scanner s = null;
+		try {
+			s = new Scanner(new File(FILE_PATH));
+		} catch (FileNotFoundException e) {
+			System.err.println("fsm file " + FILE_PATH + " not found " + e);
+			System.exit(-1);
 		}
-
-		public int getFromState() {
-			return fromState;
+		Scanner s2;
+		String line;
+		String os;
+		FSM fsm = new FSM(ISyms, OSyms);
+		do {
+			if (!s.hasNext()) {
+				System.out.println("Empty input file " + FILE_PATH);
+				System.exit(-1);
+			}
+			line = s.nextLine();
+			int hashpos = line.indexOf('#');
+			if (hashpos != -1)
+				line = line.substring(0, hashpos);
+			s2 = new Scanner(line);
+		} while (!s2.hasNext());
+		fsm.SetStartState(s2.next());
+		if (s2.hasNext()) {
+			System.out.println("Too many tokens on first line, should just be start state name");
+			System.out.println("  dicarding " + s2.nextLine());
 		}
-		public int getInSym() {
-			return inSym;
+		while (s.hasNext()) {
+			line = s.nextLine();
+			int hashpos = line.indexOf('#');
+			if (hashpos != -1)
+				line = line.substring(0, hashpos);
+			s2 = new Scanner(line);
+			if (!s2.hasNext())
+				continue;
+			String fstate = s2.next();
+			if (!s2.hasNext())
+				System.out.println("line " + line + " has too few tokens, ignoring it");
+			else {
+				String onsym = s2.next();
+				if (!s2.hasNext())
+					System.out.println("line " + line + " has too few tokens, ignoring it");
+				else {
+					Vector<String> osyms = new Vector<String>();
+					while (true) {
+						os = s2.next();
+						if (!s2.hasNext())
+							break;
+						osyms.add(os);
+					}
+					try {
+						fsm.AddTransition(fstate, onsym, osyms.toArray(new String[osyms.size()]), os);
+					} catch (Exception e) {
+						System.out.println(e);
+					}
+				}
+			}
 		}
-		public int[] getOutSyms() {
-			return outSyms;
-		}
-		public int getToState() {
-			return toState;
-		}	
+		fsm.ResetMachine();
+		System.out.println("FSM Loaded.\n");
+		return fsm;
 	}
-	
+
 	private Vector<Transition> transitions= new Vector<Transition>();
 	private String inSyms[];
 	private String outSyms[];
@@ -38,7 +82,7 @@ public class FSMModel {
 	private int startState;
 	private int stateNow = -1;
 	
-	public FSMModel(String[] inSyms, String[] outSyms) {
+	public FSM(String[] inSyms, String[] outSyms) {
 		this.inSyms = inSyms;
 		this.outSyms = outSyms;
 	}
@@ -76,7 +120,7 @@ public class FSMModel {
 	
 	private Transition findTransition( int state, int inSym) {
 		for (Transition t : transitions) {
-			if (t.fromState == state && t.inSym == inSym) {
+			if (t.getFromState() == state && t.getInSym() == inSym) {
 				return t;
 			}
 		}

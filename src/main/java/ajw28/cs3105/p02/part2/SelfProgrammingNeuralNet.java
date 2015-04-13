@@ -1,5 +1,6 @@
 package ajw28.cs3105.p02.part2;
 
+import ajw28.cs3105.p02.part2.fsm.FSM;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.pattern.ElmanPattern;
@@ -10,7 +11,17 @@ import org.encog.neural.pattern.ElmanPattern;
 public class SelfProgrammingNeuralNet {
 
     BasicNetwork net;
-    public SelfProgrammingNeuralNet() {
+    FSM fsm;
+
+    public SelfProgrammingNeuralNet(FSM fsm) {
+        this.fsm = fsm;
+        construct();
+    }
+
+    /**
+     * Construct a neural network for the given Finite State Machine
+     */
+    private void construct(){
         /*Setup an Elman type neural network*/
         ElmanPattern elmanPattern = new ElmanPattern();
         elmanPattern.setActivationFunction(new ActivationSigmoid());

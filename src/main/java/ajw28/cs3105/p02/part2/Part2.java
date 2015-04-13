@@ -1,5 +1,7 @@
 package ajw28.cs3105.p02.part2;
 
+import ajw28.cs3105.p02.part2.fsm.FSM;
+
 /**
  * Part 2 contains the main method for demonstrating the meeting of Part 2 Specifications of the practical
  */
@@ -11,7 +13,8 @@ public class Part2 {
      * @param args No arguments are needed
      */
     public static void main(String[] args){
-        SelfProgrammingNeuralNet net = new SelfProgrammingNeuralNet();
+        FSM fsm = FSM.parse();
+        SelfProgrammingNeuralNet net = new SelfProgrammingNeuralNet(fsm);
 
     }
 
