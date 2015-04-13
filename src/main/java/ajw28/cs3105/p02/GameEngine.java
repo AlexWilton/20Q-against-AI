@@ -2,16 +2,37 @@ package ajw28.cs3105.p02;
 
 import java.util.Scanner;
 
+/**
+ * Game Engine facilitates game play. Including asking human player questions, interpreting responses
+ * and relating to the 20 questions neural network.
+ */
 public class GameEngine {
+
+    /**
+     * Neural Net which is used for obtaining questions, depositing answers and guessing player's concept.
+     */
     private NeuralNet20Q net;
+
+    /**
+     * Scanner used to obtain input from player
+     */
     private Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Construct a Game Engine for a given neural network
+     * @param net Neural Network
+     */
     public GameEngine(NeuralNet20Q net) {
         this.net = net;
     }
 
-    public void startGame(){
-        System.out.println("//// Welcome to 20 Questions ////\nPlease think of a (simple) animal. Hold it in your mind and then press enter");
+    /**
+     * Start game play experience for human playing making use of standard input and output.
+     * Questions are asked, answers recorded and knowledge base updated if neural network is wrong.
+     */
+    public void playGame(){
+        System.out.println("//// Welcome to 20 Questions ////" +
+                "\nPlease think of a (simple) animal. Hold it in your mind and then press enter");
         scanner.nextLine(); //wait for enter to be pressed
         System.out.println("Please respond 'true' or 'false' to every question'. (I won't understand anything else)");
 
@@ -54,6 +75,10 @@ public class GameEngine {
 
     }
 
+    /**
+     * A helper method for waiting for a boolean input from user.
+     * @return Boolean parsed from user's response in standard input
+     */
     private boolean getYesOrNoFromUser(){
         while(true){
             try{

@@ -1,0 +1,10 @@
+Question Number,Question,Dog,Cat,Ant,Chicken,Rabbit,Rat,Snake,Elephant
+1,Does it have four legs?,1,1,0,0,1,1,0,1
+2,Does it have fur?,1,1,0,0,1,1,0,0
+3,Is it typically the same size or smaller than a dog?,1,1,1,1,1,1,1,0
+4,Does it lay eggs?,0,0,1,1,0,0,1,0
+5,Would you typically take it for a walk?,1,0,0,0,0,0,0,0
+6,Does it have feathers?,0,0,0,1,0,0,0,0
+7,Is it apart of the feline family?,0,1,0,0,0,0,0,0
+8,Is it apart of the rodent family?,0,1,0,0,0,1,0,0
+9,Does it have a tough hide?,0,0,0,0,0,0,1,1
