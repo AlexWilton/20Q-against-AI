@@ -9,7 +9,7 @@ import org.encog.ml.data.basic.BasicMLData;
 import org.encog.ml.data.basic.BasicMLDataSet;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
-import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
+import org.encog.neural.networks.training.propagation.back.Backpropagation;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -24,7 +24,7 @@ public class NeuralNet20Q {
     private ArrayList<Concept> concepts = new ArrayList<Concept>();
     private BasicNetwork net;
     private int numberOfInputUnits, numberOfHiddenUnits, numberOfOutputUnits;
-    public static double MAX_ERROR = 0.04;
+    public static double MAX_ERROR = 0.05;
 
     public NeuralNet20Q(){
         this(DEFAULT_Q_FILE_PATH);
@@ -65,8 +65,7 @@ public class NeuralNet20Q {
                 //parse question answers
                 for(int conceptNum=0; conceptNum < columns.length -2; conceptNum++) {
                     int columnOfConceptAnswer = conceptNum + 2;
-                    boolean answer = false;
-                    if(columns[columnOfConceptAnswer].equals("1")) answer = true;
+                    double answer = Double.parseDouble(columns[columnOfConceptAnswer]);
                     newQuestion.addResponseForConcept(concepts.get(conceptNum), answer);
                 }
             }
@@ -113,9 +112,9 @@ public class NeuralNet20Q {
         MLDataSet trainingSet = new BasicMLDataSet(netInputs, netOuts);
 
         // train the neural network
-        ResilientPropagation trainer = new ResilientPropagation(net, trainingSet);
-
         while(true){
+            Backpropagation trainer = new Backpropagation(net, trainingSet, 0.3, 0.8);
+
             int numOfEpochsToTrainFor = 10000 + 100 * concepts.size() * concepts.size() * numberOfHiddenUnits * numberOfHiddenUnits;
             trainer.iteration(numOfEpochsToTrainFor);
             if(trainer.getError() > MAX_ERROR){
@@ -124,7 +123,6 @@ public class NeuralNet20Q {
                         "Increasing number of hidden units from " + numberOfHiddenUnits + " to " + (numberOfHiddenUnits +1) + " and will try again");
                 numberOfHiddenUnits++;
                 constructNet();
-                trainer = new ResilientPropagation(net, trainingSet);
             }else{
                 trainer.finishTraining();
                 break;
@@ -148,8 +146,7 @@ public class NeuralNet20Q {
         for(int conceptNum=0; conceptNum < concepts.size(); conceptNum++){
             Concept concept = concepts.get(conceptNum);
             for(int questionNum=0; questionNum < concepts.size(); questionNum++){
-                double val = 0.0;
-                if(questions.get(questionNum).getResponseForConcept(concept)) val = 1.0;
+                double val = questions.get(questionNum).getResponseForConcept(concept);
                 netInputs[conceptNum][questionNum] = val;
             }
         }
@@ -173,6 +170,13 @@ public class NeuralNet20Q {
         return null; //no questions left to unanswer.
     }
 
+    public Boolean hasNextQuestion(){
+        if(nextQuestion() == null)
+            return false;
+        else
+            return true;
+    }
+
     public boolean isReadyToGuess(double allowedError) {
         double[][] netInputs = {calculateNetInputsFromQuestionAnswers()};
         double[][] netOuts = {makeBestGuess().getIdEncodedInBinary(numberOfOutputUnits)};
@@ -183,13 +187,26 @@ public class NeuralNet20Q {
             return true;
     }
 
+
     public Concept makeBestGuess() {
         MLData netOuput = net.compute(new BasicMLData(calculateNetInputsFromQuestionAnswers()));
         int conceptId = Concept.convertOutputToID(netOuput);
         return concepts.get(conceptId);
     }
 
-    public void recordConceptFromHumanAfterAnsweringQuestions(String realAnswer) {
-        //TODO
+    public void recordConceptAndQuestionFromHuman(String conceptName, String question) {
+        int unusedConceptId = concepts.size();
+        Concept newConcept = new Concept(unusedConceptId, conceptName);
+        Concept guessedConcept = makeBestGuess();
+        int unusedQuestionId = questions.size();
+        Question newQuestion = new Question(unusedQuestionId, question);
+        for(Concept c : concepts) {
+            if(c != guessedConcept)
+                newQuestion.addResponseForConcept(c, 0.5);
+        }
+        newQuestion.addResponseForConcept(newConcept, 1);
+        newQuestion.addResponseForConcept(guessedConcept, 0);
+
+        System.out.println("Concept: " + conceptName + " and question: " + question + " recorded in data structure");
     }
 }

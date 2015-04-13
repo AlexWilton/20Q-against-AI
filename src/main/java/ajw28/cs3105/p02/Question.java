@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class Question{
     private int questionID;
     private String questionToAsk;
-    private HashMap<Concept, Boolean> conceptResponses = new HashMap<Concept, Boolean>();
+    private HashMap<Concept, Double> conceptResponses = new HashMap<Concept, Double>();
     private double answer = UNANSWERED;
     public static double YES=1, NO=0, UNANSWERED=0.5;
 
@@ -14,11 +14,16 @@ public class Question{
         this.questionToAsk = questionToAsk;
     }
 
-    public void addResponseForConcept(Concept concept, boolean answer){
+    /**
+     * Record ideal answer for when answering this question with the given concept in mind.
+     * @param concept   Concept
+     * @param answer    Answers (0 for No, 0.5 for Unknown and 1 for Yes)
+     */
+    public void addResponseForConcept(Concept concept, double answer){
         conceptResponses.put(concept, answer);
     }
 
-    public boolean getResponseForConcept(Concept concept){
+    public double getResponseForConcept(Concept concept){
         return conceptResponses.get(concept);
     }
 

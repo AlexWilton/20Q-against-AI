@@ -13,6 +13,7 @@ public class GameEngine {
     public void startGame(){
         System.out.println("//// Welcome to 20 Questions ////\nPlease think of a (simple) animal. Hold it in your mind and then press enter");
         scanner.nextLine(); //wait for enter to be pressed
+        System.out.println("Please respond 'true' or 'false' to every question'. (I won't understand anything else)");
 
         int questionNumber = 1;
         do{
@@ -23,7 +24,7 @@ public class GameEngine {
             question.recordQuestionAnswer(answer);
 
             questionNumber++;
-        }while(!net.isReadyToGuess(0.00001));
+        }while(net.hasNextQuestion() && questionNumber <= 20);
 
         Concept guess = net.makeBestGuess();
         System.out.println("After " + (questionNumber-1) + " questions, I am ready to guess..." +
@@ -36,9 +37,19 @@ public class GameEngine {
             System.out.println("What were you actually thinking of? (Please help me learn)");
             String realAnswer = "";
             while(realAnswer.length() < 2) realAnswer = scanner.nextLine();
-            System.out.println("I've added your answer to my knowledge base (along with the answers which you gave to my questions)" +
-                    "\nGreat! Please only respond 'true' or 'false' as this is currently the only input I understand");
-            net.recordConceptFromHumanAfterAnsweringQuestions(realAnswer);
+            boolean needN = (new Concept(-1, realAnswer).isFirstLetterOfNameAVowel());
+
+            System.out.println("So you were thinking of a" + (needN ? "n " : " ") + realAnswer + "" +
+                            "\nI would to add this question to my knowledge base, however, I'm having trouble distinguishing this concept from another concept." +
+                    "\nPlease provide me with a question where the answer is yes for " + realAnswer + " and no for " + guess);
+
+            String newQuestion = "";
+            while(newQuestion.length() < 7) newQuestion = scanner.nextLine();
+
+
+            System.out.println("I've added your answer and question to my knowledge base (along with the answers which you gave to my questions)" +
+                    "\nThanks for playing, have a great day!");
+            net.recordConceptAndQuestionFromHuman(realAnswer, newQuestion);
         }
 
     }
