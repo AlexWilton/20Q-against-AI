@@ -34,7 +34,7 @@ public class GameEngine {
         System.out.println("//// Welcome to 20 Questions ////" +
                 "\nPlease think of a (simple) animal. Hold it in your mind and then press enter");
         scanner.nextLine(); //wait for enter to be pressed
-        System.out.println("Please respond 'true' or 'false' to every question'. (I won't understand anything else)");
+        System.out.println("Please respond 'yes' (or 'y') or 'no' (or 'n') to every question'. (I won't understand anything else)");
 
         int questionNumber = 1;
         do{
@@ -45,12 +45,12 @@ public class GameEngine {
             question.recordQuestionAnswer(answer);
 
             questionNumber++;
-        }while(net.hasNextQuestion() && questionNumber <= 20);
+        }while(net.hasNextQuestion() && !net.isReadyToGuess() && questionNumber <= 20);
 
         Concept guess = net.makeBestGuess();
         System.out.println("After " + (questionNumber-1) + " questions, I am ready to guess..." +
                 "\nI think that you've been thinking of a" + (guess.isFirstLetterOfNameAVowel() ? "n " : " ") + guess +
-                "\nAm I right? (True/False)\n");
+                "\nAm I right? (Yes/No)\n");
         boolean amIRight = getYesOrNoFromUser();
         if(amIRight){
             System.out.println("Fantastic! My creator will be so proud of me! Thank you for playing!");
@@ -80,18 +80,16 @@ public class GameEngine {
      * @return Boolean parsed from user's response in standard input
      */
     private boolean getYesOrNoFromUser(){
-        while(true){
-            try{
-                boolean answer;
-                while(!scanner.hasNextBoolean()){}
-                    answer = scanner.nextBoolean();
-
-                return answer;
-            }catch (Exception e){
-                System.out.println("Please respond either 'true' or 'false' to the question.");
-
+        String line;
+        while( (line = scanner.nextLine()) != "") {
+            if (line.equalsIgnoreCase("y") || line.equalsIgnoreCase("yes")) {
+                return true;
+            } else if (line.equalsIgnoreCase("n") || line.equalsIgnoreCase("no")) {
+                return false;
             }
         }
+        System.out.println("Failed to read Input from user correctly. Answer 'no' assumed.");
+        return false;
     }
 
 }

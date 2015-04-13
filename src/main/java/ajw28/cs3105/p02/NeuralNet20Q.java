@@ -1,9 +1,7 @@
 package ajw28.cs3105.p02;
 
-import org.encog.Encog;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.ml.data.MLData;
-import org.encog.ml.data.MLDataPair;
 import org.encog.ml.data.MLDataSet;
 import org.encog.ml.data.basic.BasicMLData;
 import org.encog.ml.data.basic.BasicMLDataSet;
@@ -13,6 +11,8 @@ import org.encog.neural.networks.training.propagation.back.Backpropagation;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
 
 /**
  * Neural Network. Must be trained using training data (initially read in from a file). Provides questions to be asked
@@ -108,7 +108,7 @@ public class NeuralNet20Q {
                 Question q = questions.get(i);
                 writer.append( q.getQuestionID() + "," + q);
                 for(Concept c : concepts){
-                    writer.append( "," + q.getResponseForConcept(c));
+                    writer.append( "," + q.getCorrectResponseForConcept(c));
                 }
                 writer.append("\n");
             }
@@ -234,7 +234,7 @@ public class NeuralNet20Q {
         for(int conceptNum=0; conceptNum < concepts.size(); conceptNum++){
             Concept concept = concepts.get(conceptNum);
             for(int questionNum=0; questionNum < concepts.size(); questionNum++){
-                double val = questions.get(questionNum).getResponseForConcept(concept);
+                double val = questions.get(questionNum).getCorrectResponseForConcept(concept);
                 netInputs[conceptNum][questionNum] = val;
             }
         }
@@ -255,16 +255,67 @@ public class NeuralNet20Q {
 
     /**
      * Determined next question to ask player
-     * @return Question
+     * @return Question. Null is returned if there are no more questions to ask.
      */
     public Question nextQuestion() {
-        //current implementation: find first unanswered questions TODO Choose questions that eliminates the most alternatives at each stage
-        for(Question q : questions){
-            if(q.getAnswer() == 0.5)
-                return q;
+
+        HashSet<Concept> possibleConcepts = possibleConceptsForCurrentAnswerSet();
+        ArrayList<Question> unaskedQuestions = new ArrayList<Question>();
+        for(Question q : questions)
+            if(q.getAnswer() == Question.UNANSWERED) unaskedQuestions.add(q);
+
+        /*Calculate how many possible concepts there would be after asking each unasked question*/
+        int[] numberOfPossibleConceptsAfterAskingQuestion = new int[unaskedQuestions.size()];
+        for(int questionIndex=0; questionIndex < unaskedQuestions.size(); questionIndex++){
+            Question currentQuestion = unaskedQuestions.get(questionIndex);
+            currentQuestion.recordQuestionAnswer(true);
+            int remainingConceptsIfAnsweredYes = possibleConceptsForCurrentAnswerSet().size();
+            currentQuestion.recordQuestionAnswer(false);
+            int remainingConceptsIfAnsweredNo = possibleConceptsForCurrentAnswerSet().size();
+            currentQuestion.markAnswerAsUnasked();
+            numberOfPossibleConceptsAfterAskingQuestion[questionIndex] = remainingConceptsIfAnsweredYes + remainingConceptsIfAnsweredNo;
         }
-        return null; //no questions left to answer.
+
+        /*Find and return question eliminating the largest number of concepts*/
+        int smallestNum = Integer.MAX_VALUE;
+        ArrayList<Question> questionsEliminatingMostConcepts = new ArrayList<>();
+        for(int i=0; i < numberOfPossibleConceptsAfterAskingQuestion.length; i++){
+            if(numberOfPossibleConceptsAfterAskingQuestion[i] < smallestNum) {
+                smallestNum = numberOfPossibleConceptsAfterAskingQuestion[i];
+                questionsEliminatingMostConcepts = new ArrayList<>();
+            }
+            if(numberOfPossibleConceptsAfterAskingQuestion[i] == smallestNum)
+                questionsEliminatingMostConcepts.add(unaskedQuestions.get(i));
+
+        }
+
+        if(questionsEliminatingMostConcepts.size() == 0) return null; //return null if there are no possible questions to ask.
+
+        Random random = new Random();
+        return questionsEliminatingMostConcepts.get(random.nextInt(questionsEliminatingMostConcepts.size()));
     }
+
+    /**
+     * Rule out concepts based on already received answers to questions.
+     * @return HashSet of Possible Concepts
+     */
+    private HashSet<Concept> possibleConceptsForCurrentAnswerSet(){
+        HashSet<Concept> possibleConcepts = new HashSet<Concept>();
+        possibleConcepts.addAll(concepts);
+        for(Question question : questions){
+            for(Concept concept : concepts) {
+                double correctResponseForConcept = question.getCorrectResponseForConcept(concept);
+                double currentAnswerForQuestion = question.getAnswer();
+                if(        (correctResponseForConcept == Question.YES && currentAnswerForQuestion == Question.NO)
+                        || (correctResponseForConcept == Question.NO && currentAnswerForQuestion == Question.YES)){
+                    possibleConcepts.remove(concept);
+                }
+            }
+        }
+        return possibleConcepts;
+    }
+
+
 
     /**
      * Check whether nextQuestion() will return a question
@@ -279,10 +330,12 @@ public class NeuralNet20Q {
     }
 
     /**
-     * Determine whether the neural network is ready to make a guess at the player's concept
+     * Determine whether the neural network is ready to make a guess at the player's concept.
      */
     public boolean isReadyToGuess() {
-        //TODO find the number of concepts possible for the current set of answers, if the size < 2 return true, else return false
+        /*Make guess if there's only one possible answer or cut losses if net doesn't know concept*/
+        if(possibleConceptsForCurrentAnswerSet().size() < 2)
+            return true;
         return false;
     }
 
@@ -313,7 +366,7 @@ public class NeuralNet20Q {
 
         //create and add new question
         Concept guessedConcept = makeBestGuess();
-        int unusedQuestionId = questions.size();
+        int unusedQuestionId = questions.size() + 1;
         Question newQuestion = new Question(unusedQuestionId, question);
         for(Concept c : concepts) {
             if(c != guessedConcept)

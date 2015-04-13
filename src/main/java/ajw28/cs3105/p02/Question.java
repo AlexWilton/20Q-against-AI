@@ -57,7 +57,7 @@ public class Question{
      * @param concept   Concept
      * @return  Answer (0 for No, 0.5 for Unknown and 1 for Yes)
      */
-    public double getResponseForConcept(Concept concept){
+    public double getCorrectResponseForConcept(Concept concept){
         return conceptResponses.get(concept);
     }
 
@@ -94,5 +94,13 @@ public class Question{
      */
     public int getQuestionID() {
         return questionID;
+    }
+
+
+    /**
+     * Mark Answer to Question as unasked
+     */
+    public void markAnswerAsUnasked(){
+        answer = UNANSWERED;
     }
 }
