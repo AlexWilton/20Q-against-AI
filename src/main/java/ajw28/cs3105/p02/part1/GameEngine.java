@@ -1,4 +1,4 @@
-package ajw28.cs3105.p02;
+package ajw28.cs3105.p02.part1;
 
 import java.util.Scanner;
 

@@ -1,0 +1,83 @@
+#
+# Simulate a fully functional vending machine
+#
+start # start state
+start c10 10balance #if coin entered, move to relevant balance state
+start c20 20balance
+start c50 50balance
+start a start #else, stay at current state.
+start b start
+start c start
+start r beep start
+
+10balance c10 20balance
+10balance c20 30balance
+10balance c50 60balance
+10balance a 10balance
+10balance b 10balance
+10balance c 10balance
+10balance r C10 start
+
+20balance c10 30balance
+20balance c20 40balance
+20balance c50 70balance
+20balance a A beep start
+20balance b 20balance
+20balance c 20balance
+20balance r C20 start
+
+30balance c10 40balance
+30balance c20 50balance
+30balance c50 80balance
+30balance a A beep 10balance
+30balance b B beep start
+30balance c 30balance
+30balance r C20 C10 start
+
+40balance c10 50balance
+40balance c20 60balance
+40balance c50 90balance
+40balance a A beep 20balance
+40balance b B beep 10balance
+40balance c 40balance
+40balance r C20 C20 start
+
+50balance c10 C10 beep 50balance
+50balance c20 C20 beep 50balance
+50balance c50 C50 beep 50balance
+50balance a A beep 30balance
+50balance b B beep 20balance
+50balance c C beep start
+50balance r C50 start
+
+60balance c10 C10 beep 60balance
+60balance c20 C20 beep 60balance
+60balance c50 C50 beep 60balance
+60balance a A beep 40balance
+60balance b B beep 30balance
+60balance c C beep 10balance
+60balance r C50 C10 start
+
+70balance c10 C10 beep 70balance
+70balance c20 C20 beep 70balance
+70balance c50 C50 beep 70balance
+70balance a A beep 50balance
+70balance b B beep 40balance
+70balance c C beep 20balance
+70balance r C50 C20 start
+
+80balance c10 C10 beep 80balance
+80balance c20 C20 beep 80balance
+80balance c50 C50 beep 80balance
+80balance a A beep 60balance
+80balance b B beep 50balance
+80balance c C beep 30balance
+80balance r C50 C20 C10 start
+
+90balance c10 C10 beep 90balance
+90balance c20 C20 beep 90balance
+90balance c50 C50 beep 90balance
+90balance a A beep 70balance
+90balance b B beep 60balance
+90balance c C beep 50balance
+90balance r C50 C20 C20 start

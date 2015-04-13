@@ -1,7 +1,7 @@
-package ajw28.cs3105.p02;
+package ajw28.cs3105.p02.part1;
 
 /**
- * Part 1 contains the main method for demonstrating the meeting of Part 1 of the practical
+ * Part 1 contains the main method for demonstrating the meeting of Part 1 Specifications of the practical
  */
 public class Part1 {
 
