@@ -66,7 +66,7 @@ public class NeuralNet20Q {
     /**
      * Maximum allowed error before trained may be allowed to finish
      */
-    public static double MAX_ERROR = 0.05;
+    public static double MAX_ERROR = 0.01;
 
     /**
      * Create Neural Net using data from default question data file path
@@ -83,7 +83,7 @@ public class NeuralNet20Q {
         questionFilePath = q_file_path;
         readInQuestionsAndConceptsFromCSV(q_file_path);
         numberOfInputUnits = questions.size();
-        numberOfHiddenUnits = 1;
+        numberOfHiddenUnits = 2;
         numberOfOutputUnits = (int) Math.ceil(Math.log(concepts.size()) / Math.log(2));
         constructNet();
     }
@@ -258,8 +258,6 @@ public class NeuralNet20Q {
      * @return Question. Null is returned if there are no more questions to ask.
      */
     public Question nextQuestion() {
-
-        HashSet<Concept> possibleConcepts = possibleConceptsForCurrentAnswerSet();
         ArrayList<Question> unaskedQuestions = new ArrayList<Question>();
         for(Question q : questions)
             if(q.getAnswer() == Question.UNANSWERED) unaskedQuestions.add(q);
@@ -268,9 +266,9 @@ public class NeuralNet20Q {
         int[] numberOfPossibleConceptsAfterAskingQuestion = new int[unaskedQuestions.size()];
         for(int questionIndex=0; questionIndex < unaskedQuestions.size(); questionIndex++){
             Question currentQuestion = unaskedQuestions.get(questionIndex);
-            currentQuestion.recordQuestionAnswer(true);
+            currentQuestion.recordQuestionAnswer(1.0);
             int remainingConceptsIfAnsweredYes = possibleConceptsForCurrentAnswerSet().size();
-            currentQuestion.recordQuestionAnswer(false);
+            currentQuestion.recordQuestionAnswer(0.0);
             int remainingConceptsIfAnsweredNo = possibleConceptsForCurrentAnswerSet().size();
             currentQuestion.markAnswerAsUnasked();
             numberOfPossibleConceptsAfterAskingQuestion[questionIndex] = remainingConceptsIfAnsweredYes + remainingConceptsIfAnsweredNo;
@@ -323,10 +321,7 @@ public class NeuralNet20Q {
      * @return true only if nextQuestion() will return a question
      */
     public Boolean hasNextQuestion(){
-        if(nextQuestion() == null)
-            return false;
-        else
-            return true;
+        return nextQuestion() != null;
     }
 
     /**
@@ -334,9 +329,21 @@ public class NeuralNet20Q {
      */
     public boolean isReadyToGuess() {
         /*Make guess if there's only one possible answer or cut losses if net doesn't know concept*/
-        if(possibleConceptsForCurrentAnswerSet().size() < 2)
-            return true;
-        return false;
+        HashSet<Concept> possibleConcepts = possibleConceptsForCurrentAnswerSet();
+        switch (possibleConcepts.size()){
+            case 0:
+                return true; //cut losses and ask player for concept
+            case 1:
+                /* Deal with unanswered questions*/
+                Concept concept = possibleConcepts.iterator().next();
+                for(Question q : questions){
+                    if(q.getAnswer() == Question.UNANSWERED)
+                       q.recordQuestionAnswer(q.getCorrectResponseForConcept(concept));
+                }
+                return true;
+            default:
+                return false; //if there are more than more possible concepts, keep guessing.
+        }
     }
 
     /**

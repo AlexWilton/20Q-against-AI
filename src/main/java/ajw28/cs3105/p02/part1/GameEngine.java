@@ -42,7 +42,7 @@ public class GameEngine {
 
             System.out.println("\n" + questionNumber + ") " + question);
             boolean answer = getYesOrNoFromUser();
-            question.recordQuestionAnswer(answer);
+            question.recordQuestionAnswer((answer) ? 1.0 : 0.0);
 
             questionNumber++;
         }while(net.hasNextQuestion() && !net.isReadyToGuess() && questionNumber <= 20);

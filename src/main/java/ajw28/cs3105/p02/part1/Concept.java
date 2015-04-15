@@ -35,6 +35,9 @@ public class Concept {
     public double[] getIdEncodedInBinary(int numOfBits) {
         double[] result = new double[numOfBits];
         String binaryString = Integer.toBinaryString(conceptID);
+        while(binaryString.length() != numOfBits){
+            binaryString = "0" + binaryString;
+        }
         for(int resultIndex = 0; resultIndex < binaryString.length(); resultIndex++){
             if(binaryString.substring(resultIndex, resultIndex+1).equals("1"))
                 result[resultIndex] = 1.0;

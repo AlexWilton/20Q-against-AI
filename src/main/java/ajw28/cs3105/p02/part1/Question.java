@@ -71,13 +71,10 @@ public class Question{
 
     /**
      * Record response from User
-     * @param didUserRespondYes True for yes and False for no
+     * @param questionAnswer Question Answer
      */
-    public void recordQuestionAnswer(boolean didUserRespondYes){
-        if(didUserRespondYes)
-            answer = YES;
-        else
-            answer = NO;
+    public void recordQuestionAnswer(double questionAnswer){
+        answer = questionAnswer;
     }
 
     /**
