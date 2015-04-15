@@ -1,0 +1,12 @@
+Question ID,Question, Output Unit 1, Output Unit 2, Output Unit 3, Output Unit 4
+0,Dog,0.0,0.0,0.0,0.0
+1,Cat,0.0,0.0,0.0,1.0
+2,Ant,0.0,0.0,1.0,0.0
+3,Chicken,0.0,0.0,1.0,1.0
+4,Rabbit,0.0,1.0,0.0,0.0
+5,Rat,0.0,1.0,0.0,1.0
+6,Snake,0.0,1.0,1.0,0.0
+7,Elephant,0.0,1.0,1.0,1.0
+8,Human,1.0,0.0,0.0,0.0
+9,Lion,1.0,0.0,0.0,1.0
+10,Donkey,1.0,0.0,1.0,0.0

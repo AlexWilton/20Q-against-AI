@@ -37,22 +37,33 @@ public class GameEngine {
         System.out.println("Please respond 'yes' (or 'y') or 'no' (or 'n') to every question'. (I won't understand anything else)");
 
         int questionNumber = 1;
-        do{
-            Question question = net.nextQuestion();
+        boolean haveIguessed = false;
+        boolean amIright = false;
+        Concept guess = null;
+        while(net.hasNextQuestion() && questionNumber <= 20) {
+            do {
+                Question question = net.nextQuestion();
 
-            System.out.println("\n" + questionNumber + ") " + question);
-            boolean answer = getYesOrNoFromUser();
-            question.recordQuestionAnswer((answer) ? 1.0 : 0.0);
+                System.out.println("\n" + questionNumber + ") " + question);
+                boolean answer = getYesOrNoFromUser();
+                question.recordQuestionAnswer((answer) ? 1.0 : 0.0);
 
-            questionNumber++;
-        }while(net.hasNextQuestion() && !net.isReadyToGuess() && questionNumber <= 20);
+                questionNumber++;
+            } while (net.hasNextQuestion() && (haveIguessed || !net.isReadyToGuess()) && questionNumber <= 20);
 
-        Concept guess = net.makeBestGuess();
-        System.out.println("After " + (questionNumber-1) + " questions, I am ready to guess..." +
-                "\nI think that you've been thinking of a" + (guess.isFirstLetterOfNameAVowel() ? "n " : " ") + guess +
-                "\nAm I right? (Yes/No)\n");
-        boolean amIRight = getYesOrNoFromUser();
-        if(amIRight){
+            if(!haveIguessed) {
+                guess = net.makeBestGuess();
+                System.out.println("After " + (questionNumber - 1) + " questions, I am ready to guess..." +
+                        "\nI think that you've been thinking of a" + (guess.isFirstLetterOfNameAVowel() ? "n " : " ") + guess +
+                        "\nAm I right? (Yes/No)\n");
+                amIright = getYesOrNoFromUser();
+                haveIguessed = true;
+            }
+
+            if(amIright) break;
+        }
+
+        if(amIright){
             System.out.println("Fantastic! My creator will be so proud of me! Thank you for playing!");
         }else{
             System.out.println("What were you actually thinking of? (Please help me learn)");
@@ -71,6 +82,19 @@ public class GameEngine {
             System.out.println("I've added your answer and question to my knowledge base (along with the answers which you gave to my questions)" +
                     "\nThanks for playing, have a great day!");
             net.recordConceptAndQuestionFromHuman(realAnswer, newQuestion);
+            net.saveKnowledgeBase();
+        }
+
+
+        System.out.println("\nWould you like to play again?");
+        if(getYesOrNoFromUser()){
+            if(!amIright) {
+                net = new NeuralNet20Q(net.getQuestionFilePath());
+                net.train();
+            }else{
+                net.resetAllQuestions();
+            }
+            playGame();
         }
 
     }

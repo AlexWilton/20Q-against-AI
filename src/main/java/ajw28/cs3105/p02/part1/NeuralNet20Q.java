@@ -66,7 +66,7 @@ public class NeuralNet20Q {
     /**
      * Maximum allowed error before trained may be allowed to finish
      */
-    public static double MAX_ERROR = 0.01;
+    public static double MAX_ERROR = 0.05;
 
     /**
      * Create Neural Net using data from default question data file path
@@ -207,7 +207,7 @@ public class NeuralNet20Q {
         while(true){
             Backpropagation trainer = new Backpropagation(net, trainingSet, 0.3, 0.8);
 
-            int numOfEpochsToTrainFor = 10000 + 100 * concepts.size() * concepts.size() * numberOfHiddenUnits * numberOfHiddenUnits;
+            int numOfEpochsToTrainFor = 10000 + 100 * concepts.size() * numberOfHiddenUnits;
             trainer.iteration(numOfEpochsToTrainFor);
             if(trainer.getError() > MAX_ERROR){
                 //add hidden unit and reconstructNet and trainer
@@ -313,6 +313,17 @@ public class NeuralNet20Q {
         return possibleConcepts;
     }
 
+    /**
+     * Obtain a set of questions which are unanswered
+     * @return Set of unanswered questions
+     */
+    private HashSet<Question> unansweredQuestions(){
+        HashSet<Question> unansweredQuestions = new HashSet<>();
+        for(Question q : questions)
+            if(q.getAnswer() == Question.UNANSWERED)
+                unansweredQuestions.add(q);
+        return unansweredQuestions;
+    }
 
 
     /**
@@ -334,12 +345,6 @@ public class NeuralNet20Q {
             case 0:
                 return true; //cut losses and ask player for concept
             case 1:
-                /* Deal with unanswered questions*/
-                Concept concept = possibleConcepts.iterator().next();
-                for(Question q : questions){
-                    if(q.getAnswer() == Question.UNANSWERED)
-                       q.recordQuestionAnswer(q.getCorrectResponseForConcept(concept));
-                }
                 return true;
             default:
                 return false; //if there are more than more possible concepts, keep guessing.
@@ -347,12 +352,17 @@ public class NeuralNet20Q {
     }
 
     /**
-     * Use the netural network to find out what concept the player is most likely thinking of
-     * @return Concept the player is most likely thinkning of
+     * Use the neural network to find out what concept the player is most likely thinking of
+     * @return Concept the player is most likely thinking of.
      */
     public Concept makeBestGuess() {
-        MLData netOuput = net.compute(new BasicMLData(calculateNetInputsFromQuestionAnswers()));
-        int conceptId = Concept.convertOutputToID(netOuput);
+        HashSet<Question> unansweredQuestions = unansweredQuestions();
+        for(Question q : unansweredQuestions)
+            q.recordQuestionAnswer(q.getCorrectResponseForConcept(possibleConceptsForCurrentAnswerSet().iterator().next()));
+        MLData netOutput = net.compute(new BasicMLData(calculateNetInputsFromQuestionAnswers()));
+        for(Question q : unansweredQuestions)
+            q.markAnswerAsUnasked();
+        int conceptId = Concept.convertOutputToID(netOutput);
         return concepts.get(conceptId);
     }
 
@@ -382,11 +392,7 @@ public class NeuralNet20Q {
         newQuestion.addResponseForConcept(newConcept, 1);
         newQuestion.addResponseForConcept(guessedConcept, 0);
         questions.add(newQuestion);
-
-
-
         concepts.add(newConcept);
-        System.out.println("Concept: " + conceptName + " and question: " + question + " recorded in data structure");
     }
 
     /**
@@ -396,5 +402,52 @@ public class NeuralNet20Q {
     public void saveKnowledgeBase(){
         if(knowledgeBaseChanged)
             storeChangesToCSV(questionFilePath);
+    }
+
+    /**
+     * File Path of Neural Network's data file
+     * @return File Path as a String
+     */
+    public String getQuestionFilePath() {
+        return questionFilePath;
+    }
+
+    /**
+     * Mark all questions as unanswered
+     */
+    public void resetAllQuestions(){
+        for(Question q : questions){
+            q.markAnswerAsUnasked();
+        }
+    }
+
+    /**
+     * Generates a Concept Output Table
+     */
+    public void generateConceptOutputTable() {
+        try {
+        FileWriter writer = new FileWriter("conceptOutputTable.csv");
+
+        //create head line for csv
+        writer.append("Concept ID,Concept");
+        for(int i=1; i <= numberOfOutputUnits; i++) writer.append(", Output Unit " + i);
+        writer.append("\n");
+
+        //fill in question and answers for each concept line by line
+        for(Concept c : concepts){
+            writer.append(c.getConceptID() + "," + c.getName());
+            double[] binaryId = c.getIdEncodedInBinary(numberOfOutputUnits);
+            for(int i=1; i <= numberOfOutputUnits; i++){
+                writer.append("," + binaryId[i-1]);
+            }
+            writer.append("\n");
+        }
+
+
+        writer.flush();
+        writer.close();
+    }catch (IOException e){
+        System.out.println("Attempt to write concept output table failed!");
+    }
     }
 }

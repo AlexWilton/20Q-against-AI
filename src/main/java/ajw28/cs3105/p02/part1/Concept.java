@@ -49,6 +49,14 @@ public class Concept {
     }
 
     /**
+     * Concept ID
+     * @return Integer representation of Concept ID
+     */
+    public int getConceptID() {
+        return conceptID;
+    }
+
+    /**
      * Name of Concept
      * @return Concept Name
      */
