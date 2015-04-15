@@ -8,7 +8,7 @@ start c50 50balance
 start a start #else, stay at current state.
 start b start
 start c start
-start r beep start
+start r start
 
 10balance c10 20balance
 10balance c20 30balance
