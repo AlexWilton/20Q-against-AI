@@ -1,83 +1,79 @@
-#
-# Simulate a fully functional vending machine
-#
-start # start state
-start c10 10balance #if coin entered, move to relevant balance state
-start c20 20balance
-start c50 50balance
-start a start #else, stay at current state.
-start b start
-start c start
-start r start
+emptyBalance c10 noOutput 10Balance
+emptyBalance c20 noOutput 20Balance
+emptyBalance c50 noOutput 50Balance
+emptyBalance a noOutput emptyBalance
+emptyBalance b noOutput emptyBalance
+emptyBalance c noOutput emptyBalance
+emptyBalance r noOutput emptyBalance
 
-10balance c10 20balance
-10balance c20 30balance
-10balance c50 60balance
-10balance a 10balance
-10balance b 10balance
-10balance c 10balance
-10balance r C10 start
+10Balance c10 noOutput 20Balance
+10Balance c20 noOutput 30Balance
+10Balance c50 noOutput 60Balance
+10Balance a noOutput 10Balance
+10Balance b noOutput 10Balance
+10Balance c noOutput 10Balance
+10Balance r C10 emptyBalance
 
-20balance c10 30balance
-20balance c20 40balance
-20balance c50 70balance
-20balance a A start
-20balance b 20balance
-20balance c 20balance
-20balance r C20 start
+20Balance c10 noOutput 30Balance
+20Balance c20 noOutput 40Balance
+20Balance c50 noOutput 70Balance
+20Balance a A emptyBalance
+20Balance b noOutput 20Balance
+20Balance c noOutput 20Balance
+20Balance r C20 emptyBalance
 
-30balance c10 40balance
-30balance c20 50balance
-30balance c50 80balance
-30balance a A 10balance
-30balance b B start
-30balance c 30balance
-30balance r C20 C10 start
+30Balance c10 noOutput 40Balance
+30Balance c20 noOutput 50Balance
+30Balance c50 noOutput 80Balance
+30Balance a A 10Balance
+30Balance b B emptyBalance
+30Balance c noOutput 30Balance
+30Balance r C30 emptyBalance
 
-40balance c10 50balance
-40balance c20 60balance
-40balance c50 90balance
-40balance a A 20balance
-40balance b B 10balance
-40balance c 40balance
-40balance r C20 C20 start
+40Balance c10 noOutput 50Balance
+40Balance c20 noOutput 60Balance
+40Balance c50 noOutput 90Balance
+40Balance a A 20Balance
+40Balance b B 10Balance
+40Balance c noOutput 40Balance
+40Balance r C40 emptyBalance
 
-50balance c10 C10 50balance
-50balance c20 C20 50balance
-50balance c50 C50 50balance
-50balance a A 30balance
-50balance b B 20balance
-50balance c C start
-50balance r C50 start
+50Balance c10 C10 50Balance
+50Balance c20 C20 50Balance
+50Balance c50 C50 50Balance
+50Balance a A 30Balance
+50Balance b B 20Balance
+50Balance c C emptyBalance
+50Balance r C50 emptyBalance
 
-60balance c10 C10 60balance
-60balance c20 C20 60balance
-60balance c50 C50  60balance
-60balance a A 40balance
-60balance b B 30balance
-60balance c C 10balance
-60balance r C50 C10 start
+60Balance c10 C10 60Balance
+60Balance c20 C20 60Balance
+60Balance c50 C50 60Balance
+60Balance a A 40Balance
+60Balance b B 30Balance
+60Balance c C 10Balance
+60Balance r C60 emptyBalance
 
-70balance c10 C10 70balance
-70balance c20 C20 70balance
-70balance c50 C50 70balance
-70balance a A 50balance
-70balance b B 40balance
-70balance c C 20balance
-70balance r C50 C20 start
+70Balance c10 C10 70Balance
+70Balance c20 C20 70Balance
+70Balance c50 C50 70Balance
+70Balance a A 50Balance
+70Balance b B 40Balance
+70Balance c C 20Balance
+70Balance r C70 emptyBalance
 
-80balance c10 C10 80balance
-80balance c20 C20 80balance
-80balance c50 C50 80balance
-80balance a A 60balance
-80balance b B 50balance
-80balance c C 30balance
-80balance r C50 C20 C10 start
+80Balance c10 C10 80Balance
+80Balance c20 C20 80Balance
+80Balance c50 C50 80Balance
+80Balance a A 60Balance
+80Balance b B 50Balance
+80Balance c C 30Balance
+80Balance r C80 emptyBalance
 
-90balance c10 C10 90balance
-90balance c20 C20 90balance
-90balance c50 C50 90balance
-90balance a A 70balance
-90balance b B 60balance
-90balance c C 50balance
-90balance r C50 C20 C20 start
+90Balance c10 C10 90Balance
+90Balance c20 C20 90Balance
+90Balance c50 C50 90Balance
+90Balance a A 70Balance
+90Balance b B 60Balance
+90Balance c C 50Balance
+90Balance r C90 emptyBalance
