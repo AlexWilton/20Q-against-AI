@@ -6,6 +6,11 @@ package ajw28.cs3105.p02.part2.fsm;
 public class Transition {
 
     /**
+     * Transition ID
+     */
+    private int id;
+
+    /**
      * State which the Transition changes from
      */
     private State origin;
@@ -32,7 +37,8 @@ public class Transition {
      * @param inputSymbol Input Symbol
      * @param outputSymbol Output Symbol
      */
-    public Transition(State origin, State destination, String inputSymbol, String outputSymbol) {
+    public Transition(int id, State origin, State destination, String inputSymbol, String outputSymbol) {
+        this.id = id;
         this.origin = origin;
         this.destination = destination;
         this.inputSymbol = inputSymbol;
@@ -69,5 +75,13 @@ public class Transition {
      */
     public String getOutputSymbol() {
         return outputSymbol;
+    }
+
+    /**
+     * Get Id
+     * @return Id
+     */
+    public int getId() {
+        return id;
     }
 }

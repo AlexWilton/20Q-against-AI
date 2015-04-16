@@ -13,9 +13,9 @@ public class Part2 {
      * @param args No arguments are needed
      */
     public static void main(String[] args){
-        FSM fsm = FSM.parse();
+        FSM fsm = new FSM();
         SelfProgrammingNeuralNet net = new SelfProgrammingNeuralNet(fsm);
-
+        net.train();
     }
 
 }

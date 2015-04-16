@@ -6,6 +6,11 @@ package ajw28.cs3105.p02.part2.fsm;
 public class State {
 
     /**
+     * State ID
+     */
+    private int id;
+
+    /**
      * Name of State
      */
     private String name;
@@ -14,7 +19,8 @@ public class State {
      * Create State using a given name
      * @param name
      */
-    public State(String name) {
+    public State(int id, String name) {
+        this.id = id;
         this.name = name;
     }
 
@@ -24,5 +30,13 @@ public class State {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Get ID
+     * @return ID
+     */
+    public int getId() {
+        return id;
     }
 }
