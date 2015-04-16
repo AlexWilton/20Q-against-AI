@@ -1,4 +1,4 @@
-Question ID,Question, Output Unit 1, Output Unit 2, Output Unit 3, Output Unit 4
+Concept ID,Concept, Output Unit 1, Output Unit 2, Output Unit 3, Output Unit 4
 0,Dog,0.0,0.0,0.0,0.0
 1,Cat,0.0,0.0,0.0,1.0
 2,Ant,0.0,0.0,1.0,0.0
