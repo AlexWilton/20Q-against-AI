@@ -23,12 +23,12 @@ public class Transition {
     /**
      * Input Symbol
      */
-    private String inputSymbol;
+    private InputSymbol inputSymbol;
 
     /**
      * Output Symbol
      */
-    private String outputSymbol;
+    private OutputSymbol outputSymbol;
 
     /**
      * Construct a Transition Object
@@ -37,7 +37,7 @@ public class Transition {
      * @param inputSymbol Input Symbol
      * @param outputSymbol Output Symbol
      */
-    public Transition(int id, State origin, State destination, String inputSymbol, String outputSymbol) {
+    public Transition(int id, State origin, State destination, InputSymbol inputSymbol, OutputSymbol outputSymbol) {
         this.id = id;
         this.origin = origin;
         this.destination = destination;
@@ -65,7 +65,7 @@ public class Transition {
      * Get Input Symbol
      * @return Input Symbol
      */
-    public String getInputSymbol() {
+    public InputSymbol getInputSymbol() {
         return inputSymbol;
     }
 
@@ -73,7 +73,7 @@ public class Transition {
      * Get Output Symbol
      * @return Output Symbol
      */
-    public String getOutputSymbol() {
+    public OutputSymbol getOutputSymbol() {
         return outputSymbol;
     }
 

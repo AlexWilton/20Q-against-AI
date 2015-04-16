@@ -89,11 +89,13 @@ public class FSM {
                 InputSymbol inputSymbol = getInputSymbolUsingStringRepresentation(inputSymbolString);
                 if(inputSymbol == null){
                     inputSymbol = new InputSymbol(inputSymbols.size(), inputSymbolString);
+                    inputSymbols.add(inputSymbol);
                 }
                 String outputSymbolString = columns[2];
                 OutputSymbol outputSymbol = getOutputSymbolUsingStringRepresentation(outputSymbolString);
                 if(outputSymbol == null){
                     outputSymbol = new OutputSymbol(outputSymbols.size(), outputSymbolString);
+                    outputSymbols.add(outputSymbol);
                 }
                 transitions.add( new Transition(transitions.size(), startState, destinationState, inputSymbol, outputSymbol));
             }
@@ -162,5 +164,21 @@ public class FSM {
      */
     public ArrayList<State> getStates() {
         return states;
+    }
+
+    /**
+     * Get list of input symbol used in FSM
+     * @return List of input symbols
+     */
+    public ArrayList<InputSymbol> getInputSymbols() {
+        return inputSymbols;
+    }
+
+    /**
+     * Get list of output symbol used in FSM
+     * @return List of output symbols
+     */
+    public ArrayList<OutputSymbol> getOutputSymbols() {
+        return outputSymbols;
     }
 }

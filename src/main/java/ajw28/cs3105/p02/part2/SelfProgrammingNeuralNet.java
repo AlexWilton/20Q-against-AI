@@ -3,13 +3,13 @@ package ajw28.cs3105.p02.part2;
 import ajw28.cs3105.p02.part2.EulerOnTour.Digraph;
 import ajw28.cs3105.p02.part2.EulerOnTour.DirectedEulerianCycle;
 import ajw28.cs3105.p02.part2.EulerOnTour.StdOut;
-import ajw28.cs3105.p02.part2.fsm.FSM;
-import ajw28.cs3105.p02.part2.fsm.State;
-import ajw28.cs3105.p02.part2.fsm.Transition;
+import ajw28.cs3105.p02.part2.fsm.*;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.ml.CalculateScore;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.MLDataSet;
+import org.encog.ml.data.basic.BasicMLData;
+import org.encog.ml.data.basic.BasicMLDataSet;
 import org.encog.ml.train.MLTrain;
 import org.encog.ml.train.strategy.Greedy;
 import org.encog.ml.train.strategy.HybridStrategy;
@@ -32,14 +32,28 @@ import java.util.LinkedList;
 public class SelfProgrammingNeuralNet {
 
     /**
+     * Number of input units
+     */
+    private int numberOfInputUnits;
+    /**
+     * Number of Hidden users
+     */
+    private int numberOfHiddenUnits;
+
+    /**
+     * Number of Output Units
+     */
+    private int numberOfOutputUnits;
+
+    /**
      * Elman Neural Network
      */
-    BasicNetwork net;
+    private BasicNetwork net;
 
     /**
      * Finite State Machine
      */
-    FSM fsm;
+    private FSM fsm;
 
     /**
      * Construct Self Programming
@@ -47,6 +61,9 @@ public class SelfProgrammingNeuralNet {
      */
     public SelfProgrammingNeuralNet(FSM fsm) {
         this.fsm = fsm;
+        numberOfInputUnits = (int) Math.ceil(Math.log(fsm.getInputSymbols().size()) / Math.log(2));
+        numberOfHiddenUnits = 10;
+        numberOfOutputUnits = (int) Math.ceil(Math.log(fsm.getOutputSymbols().size()) / Math.log(2));
         construct();
     }
 
@@ -57,9 +74,9 @@ public class SelfProgrammingNeuralNet {
         /*Setup an Elman type neural network*/
         ElmanPattern elmanPattern = new ElmanPattern();
         elmanPattern.setActivationFunction(new ActivationSigmoid());
-        elmanPattern.setInputNeurons(1);
-        elmanPattern.addHiddenLayer(6);
-        elmanPattern.setOutputNeurons(1);
+        elmanPattern.setInputNeurons(numberOfInputUnits);
+        elmanPattern.addHiddenLayer(numberOfHiddenUnits);
+        elmanPattern.setOutputNeurons(numberOfOutputUnits);
         net = (BasicNetwork) elmanPattern.generate();
     }
 
@@ -68,7 +85,7 @@ public class SelfProgrammingNeuralNet {
      * Train Neural Network using FSM's set of transitions
      */
     public void train() {
-        MLDataSet trainingSet = generateTrainingData(1000);
+        MLDataSet trainingSet = generateTrainingData();
         CalculateScore score = new TrainingSetScore(trainingSet);
         final MLTrain trainAlt = new NeuralSimulatedAnnealing( net, score, 10, 2, 100);
 
@@ -80,16 +97,21 @@ public class SelfProgrammingNeuralNet {
         trainMain.addStrategy(stop);
 
         int epoch = 0;
+        System.out.println("Training Start... (please me patience)");
         while (!stop.shouldStop()) {
             trainMain.iteration();
-            System.out.println("Training Elman net. Epoch #" + epoch
-                    + " Error:" + trainMain.getError());
+
             epoch++;
         }
+        System.out.println("Neural Net trained for " + epoch + " and with a final error of " + trainMain.getError());
 
     }
 
-    private MLDataSet generateTrainingData(int length){
+    /**
+     * Generate Training Data for training neural network to behave like the FSM
+     * @return Training Data
+     */
+    private MLDataSet generateTrainingData(){
         ArrayList<Transition> transitions = fsm.getTransitions();
         ArrayList<State> states = fsm.getStates();
 
@@ -110,7 +132,7 @@ public class SelfProgrammingNeuralNet {
             }
         }
 
-        LinkedList<Transition> path = new LinkedList<>();
+        ArrayList<Transition> path = new ArrayList<>();
         boolean[] transitionVisited = new boolean[transitions.size()];
         for(int currentStateSeqIndex=0; currentStateSeqIndex < stateSeqFromEulerianCycle.size() - 1; currentStateSeqIndex++){
             State currentState = stateSeqFromEulerianCycle.get(currentStateSeqIndex);
@@ -128,10 +150,35 @@ public class SelfProgrammingNeuralNet {
         }
 
         double[][] inputTrainingData = new double[path.size()][];
+        double[][] outputTrainingData = new double[path.size()][];
+        for(int transitionIndex = 0; transitionIndex < path.size(); transitionIndex++){
+            Transition currentTransition = path.get(transitionIndex);
+            inputTrainingData[transitionIndex] = currentTransition.getInputSymbol().getIdEncodedInBinary(numberOfInputUnits);
+            outputTrainingData[transitionIndex] = currentTransition.getOutputSymbol().getIdEncodedInBinary(numberOfOutputUnits);
+        }
 
-
-        return null;//todo
+        return new BasicMLDataSet(inputTrainingData, outputTrainingData);
     }
 
 
+    /**
+     * Put an input into the neural network and determine the output
+     * @param inputSymbol Input Symbol
+     * @return Output Symbol
+     */
+    public OutputSymbol interactWithMachine(InputSymbol inputSymbol) {
+        MLData netOutput = net.compute(new BasicMLData(inputSymbol.getIdEncodedInBinary(fsm.getInputSymbols().size())));
+        int outputSymbolId = OutputSymbol.convertOutputToID(netOutput);
+        OutputSymbol output = fsm.getOutputSymbols().get(outputSymbolId);
+        if(output.getId() != outputSymbolId) System.out.println("Error!!!! Output Ids don't match");
+        return output;
+    }
+
+    /**
+     * List of Possible Input Symbols which the system recognises
+     * @return List of Input Symbols
+     */
+    public ArrayList<InputSymbol> getPossibleInputs(){
+        return fsm.getInputSymbols();
+    }
 }

@@ -16,6 +16,8 @@ public class Part2 {
         FSM fsm = new FSM();
         SelfProgrammingNeuralNet net = new SelfProgrammingNeuralNet(fsm);
         net.train();
+        VendingEngine vendingEngine = new VendingEngine(net);
+        vendingEngine.startVending();
     }
 
 }
